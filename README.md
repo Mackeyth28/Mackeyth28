@@ -13,3 +13,5 @@
 ---
 
 ### :woman_technologist: About Me :
+Hi everyone eiei My name is Thapakorn Jaingam.
+Nice to meet you. :)
