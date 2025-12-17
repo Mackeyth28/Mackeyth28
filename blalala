@@ -1,0 +1,89 @@
+#include <stdio.h> 
+#include <unistd.h> 
+#include <stdlib.h> 
+#include <sys/wait.h> 
+main() 
+{ 
+int forkresult; 
+printf("%d: I am the parent. Remember my number!\n", getpid()); 
+printf("%d: I am now going to fork ... \n", getpid()); 
+forkresult = fork(); 
+if (forkresult != 0) 
+{ 	/* the parent will execute this code */ 
+printf("%d: My child's pid is %d\n", getpid(), forkresult); 
+} 
+else 	/* forkresult == 0 */ 
+{ 	/* the child will execute this code */ 
+printf("%d: Hi! I am the child.\n", getpid()); 
+} 
+printf("%d: like father like son. \n", getpid()); 
+}
+
+
+
+ตัวอย่างที่ 6
+#include <stdio.h> 
+main() 
+{ 
+int pid ; 
+printf("I'am the original process with PID %d and PPID %d.\n", getpid(), getppid()) ; 
+pid = fork ( ) ; /* Duplicate. Child and parent continue from here */ 
+if ( pid != 0 ) /* pid is non-zero,so I must be the parent*/ 
+{ 
+printf("I'am the parent with PID %d and PPID %d.\n", getpid(), getppid()) ; 
+printf("My child's PID is %d\n", pid ) ; 
+} 
+else 		/* pid is zero, so I must be the child */ 
+{ 
+sleep(4); /* make sure that the parent terminates first */ 
+printf("I'm the child with PID %d and PPID %d.\n", getpid(), getppid()) ; 
+} 
+printf ("PID %d terminates.\n", getpid()) ; 
+} 
+
+The output is: 
+I'am the original process with PID 5100 and PPID 5011. 
+I'am the parent process with PID 5100 and PPID 5011. 
+My child's PID is 5101 
+PID 5100 terminates. /* Parent dies */ 
+I'am the child process with PID 5101 and PPID 1. 
+/* Orphaned, whose parent process is “init” with pid 1 */ 
+PID 5101 terminates.
+
+ตัวอย่างที่ 7
+#include <stdio.h> 
+main ( ) 
+{ 
+int 	pid ; 
+pid = fork(); 	/* Duplicate. Child and parent continue from here */ 
+if ( pid != 0 ) 	/* pid is non-zero, so I must be the parent */ 
+{ 
+while (1) 		/* Never terminate and never execute a wait ( ) */ 
+sleep (100) ;		/* stop executing for 100 seconds */ 
+} 
+else 	/* pid is zero, so I must be the child */ 
+{ 
+exit (42) ; 	/* exit with any number */ 
+} 
+} 
+
+
+
+
+
+
+The output is: 
+root@CentOS> ./a.out & 		/* execute the program in the background  */
+[1] 5186 
+root@CentOS > ps 			/* obtain process status  */
+PID TT STAT TIME COMMAND 
+5187 p0 Z 0:00 <exiting> the zombie child process 
+5149 p0 S 0:01 -csh (csh) the shell 
+5186 p0 S 0:00 a.out the parent process 
+5188 p0 R 0:00 ps 
+root@CentOS > kill 5186 		/* kill the parent process  */
+[1] Terminated a.out 
+root@CentOS > ps 			/* notice that the zombie is gone now  */
+PID TT STAT TIME COMMAND 
+5149 p0 S 0:01 -csh (csh) 
+5189 p0 R 0:00 ps
