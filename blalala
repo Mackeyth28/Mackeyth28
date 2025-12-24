@@ -1,89 +1,158 @@
-#include <stdio.h> 
-#include <unistd.h> 
-#include <stdlib.h> 
-#include <sys/wait.h> 
-main() 
-{ 
-int forkresult; 
-printf("%d: I am the parent. Remember my number!\n", getpid()); 
-printf("%d: I am now going to fork ... \n", getpid()); 
-forkresult = fork(); 
-if (forkresult != 0) 
-{ 	/* the parent will execute this code */ 
-printf("%d: My child's pid is %d\n", getpid(), forkresult); 
-} 
-else 	/* forkresult == 0 */ 
-{ 	/* the child will execute this code */ 
-printf("%d: Hi! I am the child.\n", getpid()); 
-} 
-printf("%d: like father like son. \n", getpid()); 
+#include <stdio.h>
+#include <unistd.h>
+
+int main(void) {
+    printf("hello world!\n");
+    fork();
+    printf(" i am after forking\n");
+    printf("\ti am process %d.\n", getpid());
 }
 
 
 
-ตัวอย่างที่ 6
-#include <stdio.h> 
-main() 
-{ 
-int pid ; 
-printf("I'am the original process with PID %d and PPID %d.\n", getpid(), getppid()) ; 
-pid = fork ( ) ; /* Duplicate. Child and parent continue from here */ 
-if ( pid != 0 ) /* pid is non-zero,so I must be the parent*/ 
-{ 
-printf("I'am the parent with PID %d and PPID %d.\n", getpid(), getppid()) ; 
-printf("My child's PID is %d\n", pid ) ; 
-} 
-else 		/* pid is zero, so I must be the child */ 
-{ 
-sleep(4); /* make sure that the parent terminates first */ 
-printf("I'm the child with PID %d and PPID %d.\n", getpid(), getppid()) ; 
-} 
-printf ("PID %d terminates.\n", getpid()) ; 
-} 
+#include <stdio.h>
+#include <unistd.h>
 
-The output is: 
-I'am the original process with PID 5100 and PPID 5011. 
-I'am the parent process with PID 5100 and PPID 5011. 
-My child's PID is 5101 
-PID 5100 terminates. /* Parent dies */ 
-I'am the child process with PID 5101 and PPID 1. 
-/* Orphaned, whose parent process is “init” with pid 1 */ 
-PID 5101 terminates.
-
-ตัวอย่างที่ 7
-#include <stdio.h> 
-main ( ) 
-{ 
-int 	pid ; 
-pid = fork(); 	/* Duplicate. Child and parent continue from here */ 
-if ( pid != 0 ) 	/* pid is non-zero, so I must be the parent */ 
-{ 
-while (1) 		/* Never terminate and never execute a wait ( ) */ 
-sleep (100) ;		/* stop executing for 100 seconds */ 
-} 
-else 	/* pid is zero, so I must be the child */ 
-{ 
-exit (42) ; 	/* exit with any number */ 
-} 
-} 
+int main(void) {
+    int pid;
+    printf("hello world!\n");
+    printf("i am the present process and pid id : %d\n", getpid());
+    printf("Here i am before use to froking\n");
+    pid = fork();
+    printf("Here i am just forking\n");
+    if(pid == 0)
+        printf("i am the child process and pid ls :%d.\n", getpid());
+    else
+        printf("i am the present process and pid ls :%d.\n", getpid());
+}
 
 
+#include <stdio.h>
+#include <unistd.h>
+
+int main(void) {
+    printf("Here i am just before firt forking statement\n");
+    fork();
+    printf("Here i am just after firt forking statement\n");
+    fork();
+    printf("Here i am just after second forking statement\n");
+    printf("\t\tHello world form process %d:\n", getpid());
+}
+
+
+#include <stdio.h>
+#include <sys/wait.h>
+#include <unistd.h>
+#include <stdlib.h>
+
+int main(void) {
+    int pid;
+    int status;
+    printf("Hello world!\n");
+    pid = fork();
+    if(pid == -1) {
+        perror("bad fork");
+        exit(1);
+    }
+    if(pid == 0) {
+        printf("i am the child process.\n");
+    } else {
+        wait(&status);
+        printf("i am the parent process.\n");
+    }
+}
+
+
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(int argc, char *argv[]) {
+    char *who;
+    int i;
+
+    if(fork()) {
+        who = "Kittinun Pewkhum"; 
+    } else {
+        who = "child";
+    }
+
+    for(i = 0; i < 6; i++) {
+        printf("fork1: %s\n", who);
+    }
+
+    exit(0);
+}
+
+
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(int argc, char *argv[]) {
+    int i;
+    char *who;
+    int n;
+
+    if (fork()) {
+        who = "parent";
+        n = 2;
+    } else {
+        who = "child";
+        n = 1;
+    }
+
+    for(i = 1; i <= 10; i++) {
+        fprintf(stdout, " %2d. %7s: my pid = %6d, ppid = %6d\n", i, who, getpid(), getpid());
+        fflush(stdout);
+        sleep(10);
+    }
+    exit(0);
+}
 
 
 
 
-The output is: 
-root@CentOS> ./a.out & 		/* execute the program in the background  */
-[1] 5186 
-root@CentOS > ps 			/* obtain process status  */
-PID TT STAT TIME COMMAND 
-5187 p0 Z 0:00 <exiting> the zombie child process 
-5149 p0 S 0:01 -csh (csh) the shell 
-5186 p0 S 0:00 a.out the parent process 
-5188 p0 R 0:00 ps 
-root@CentOS > kill 5186 		/* kill the parent process  */
-[1] Terminated a.out 
-root@CentOS > ps 			/* notice that the zombie is gone now  */
-PID TT STAT TIME COMMAND 
-5149 p0 S 0:01 -csh (csh) 
-5189 p0 R 0:00 ps
+#include <unistd.h>
+#include <stdio.h>
+#include <math.h>
+#include <stdlib.h>
+#include <sys/wait.h>
+
+int main(int argc, char *argv[]) {
+    char *who;
+    int status;
+
+    if(fork()) {
+        who = "parent";
+        printf("pi=%f\n", 4*atan(1));
+        wait(&status);
+        exit(0);
+    } else {
+        who = "child";
+        execlp("/usr/bin/date", "date", (char *)0);
+    }
+}
+
+
+
+#include <unistd.h>
+#include <stdio.h>
+#include <math.h>
+#include <stdlib.h>
+#include <sys/wait.h>
+
+int main(int argc, char *argv[]) {
+    char *who;
+    int status;
+
+    if(fork()) {
+        who = "parent";
+        printf("pi=%f\n", 4*atan(1));
+        wait(&status);
+        exit(0);
+    } else {
+        who = "child";
+        execlp("/bin/my-script", "my-script", "a", "b", (char *)0);
+    }
+}
