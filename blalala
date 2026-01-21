@@ -110,3 +110,96 @@ int main() {
     printf("Final counter = %d\n", counter);
     return 0;
 }
+
+
+#include <stdio.h>
+#include <pthread.h>
+#include <semaphore.h>
+#include <unistd.h>
+
+#define BUFFER_SIZE 5
+
+int buffer[BUFFER_SIZE];
+int in = 0, out = 0;
+
+sem_t empty, full, mutex;
+
+// แสดงค่า buffer ทั้งหมด
+void print_buffer() {
+    printf("Buffer: ");
+    for (int i = 0; i < BUFFER_SIZE; i++) {
+        printf("%d ", buffer[i]);
+    }
+    printf("\n");
+}
+
+void* producer(void* arg) {
+    int item = 1;
+    while (1) {
+        // รอ buffer ว่าง
+        sem_wait(&empty);
+        // เข้าสู่ critical section
+        sem_wait(&mutex);
+
+        buffer[in] = item;
+        printf("Producer produced %d at index %d\n", item, in);
+        in = (in + 1) % BUFFER_SIZE;
+        item++;
+
+        print_buffer();
+
+        // ออกจาก critical section
+        sem_post(&mutex);
+        // แจ้งว่ามีของเพิ่มแล้ว
+        sem_post(&full);
+
+        sleep(1); // ลองปรับค่าได้
+    }
+    return NULL;
+}
+
+void* consumer(void* arg) {
+    while (1) {
+        // รอถ้ามีของไม่พอ
+        sem_wait(&full);
+        // เข้าสู่ critical section
+        sem_wait(&mutex);
+
+        int item = buffer[out];
+        buffer[out] = 0; // เคลียร์ช่อง (ให้ดูง่าย)
+        printf("Consumer consumed %d at index %d\n", item, out);
+        out = (out + 1) % BUFFER_SIZE;
+
+        print_buffer();
+
+        // ออกจาก critical section
+        sem_post(&mutex);
+        // แจ้งว่ามีช่องว่างเพิ่ม
+        sem_post(&empty);
+
+        sleep(2); // ลองปรับค่าได้
+    }
+    return NULL;
+}
+
+int main() {
+    pthread_t prod, cons;
+
+    // init semaphores
+    sem_init(&empty, 0, BUFFER_SIZE); // ช่องว่างเริ่มต้น
+    sem_init(&full, 0, 0);            // ยังไม่มีข้อมูล
+    sem_init(&mutex, 0, 1);           // mutual exclusion
+
+    // init buffer ให้เป็น 0
+    for (int i = 0; i < BUFFER_SIZE; i++) {
+        buffer[i] = 0;
+    }
+
+    pthread_create(&prod, NULL, producer, NULL);
+    pthread_create(&cons, NULL, consumer, NULL);
+
+    pthread_join(prod, NULL);
+    pthread_join(cons, NULL);
+
+    return 0;
+}
