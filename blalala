@@ -1,158 +1,175 @@
 #include <stdio.h>
 #include <unistd.h>
+#include <pthread.h>
 
-int main(void) {
-    printf("hello world!\n");
-    fork();
-    printf(" i am after forking\n");
-    printf("\ti am process %d.\n", getpid());
+int counter = 0; // ตัวแปรร่วม
+
+void* increment(void* arg) {
+    for (int i = 0; i < 100000; i++) {
+        // ไม่มีการล็อก
+        counter++;
+    }
+    return NULL;
 }
 
+int main() {
+    pthread_t t1, t2;
 
+    pthread_create(&t1, NULL, increment, NULL);
+    pthread_create(&t2, NULL, increment, NULL);
 
-#include <stdio.h>
-#include <unistd.h>
+    pthread_join(t1, NULL);
+    pthread_join(t2, NULL);
 
-int main(void) {
-    int pid;
-    printf("hello world!\n");
-    printf("i am the present process and pid id : %d\n", getpid());
-    printf("Here i am before use to froking\n");
-    pid = fork();
-    printf("Here i am just forking\n");
-    if(pid == 0)
-        printf("i am the child process and pid ls :%d.\n", getpid());
-    else
-        printf("i am the present process and pid ls :%d.\n", getpid());
-}
-
-
-#include <stdio.h>
-#include <unistd.h>
-
-int main(void) {
-    printf("Here i am just before firt forking statement\n");
-    fork();
-    printf("Here i am just after firt forking statement\n");
-    fork();
-    printf("Here i am just after second forking statement\n");
-    printf("\t\tHello world form process %d:\n", getpid());
+    printf("Final counter = %d\n", counter);
+    return 0;
 }
 
 
 #include <stdio.h>
-#include <sys/wait.h>
 #include <unistd.h>
-#include <stdlib.h>
+#include <pthread.h>
 
-int main(void) {
-    int pid;
-    int status;
-    printf("Hello world!\n");
-    pid = fork();
-    if(pid == -1) {
-        perror("bad fork");
-        exit(1);
+int counter = 0; 
+pthread_mutex_t lock; // 1. Declare the mutex
+
+void* increment(void* arg) {
+    for (int i = 0; i < 100000; i++) {
+        pthread_mutex_lock(&lock);   // 3. Lock before accessing shared data
+        counter++;
+        pthread_mutex_unlock(&lock); // 4. Unlock after accessing shared data
     }
-    if(pid == 0) {
-        printf("i am the child process.\n");
-    } else {
-        wait(&status);
-        printf("i am the parent process.\n");
-    }
+    return NULL;
 }
 
+int main() {
+    pthread_t t1, t2;
 
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-int main(int argc, char *argv[]) {
-    char *who;
-    int i;
-
-    if(fork()) {
-        who = "Kittinun Pewkhum"; 
-    } else {
-        who = "child";
+    // 2. Initialize the mutex
+    if (pthread_mutex_init(&lock, NULL) != 0) {
+        printf("Mutex init failed\n");
+        return 1;
     }
 
-    for(i = 0; i < 6; i++) {
-        printf("fork1: %s\n", who);
-    }
+    pthread_create(&t1, NULL, increment, NULL);
+    pthread_create(&t2, NULL, increment, NULL);
 
-    exit(0);
+    pthread_join(t1, NULL);
+    pthread_join(t2, NULL);
+
+    // 5. Destroy the mutex when done
+    pthread_mutex_destroy(&lock);
+
+    printf("Final counter = %d\n", counter);
+    return 0;
 }
 
-
-#include <unistd.h>
 #include <stdio.h>
-#include <stdlib.h>
+#include <unistd.h>
+#include <pthread.h>
 
-int main(int argc, char *argv[]) {
-    int i;
-    char *who;
-    int n;
+int counter = 0;
+pthread_mutex_t lock;  // DECLARED: The mutex object
 
-    if (fork()) {
-        who = "parent";
-        n = 2;
-    } else {
-        who = "child";
-        n = 1;
+void* increment(void* arg) {
+    for (int i = 0; i < 100000; i++) {
+        // LOCK: Start of Critical Section
+        pthread_mutex_lock(&lock);
+        
+        counter++;
+        
+        // UNLOCK: End of Critical Section
+        pthread_mutex_unlock(&lock);
     }
-
-    for(i = 1; i <= 10; i++) {
-        fprintf(stdout, " %2d. %7s: my pid = %6d, ppid = %6d\n", i, who, getpid(), getpid());
-        fflush(stdout);
-        sleep(10);
-    }
-    exit(0);
+    return NULL;
 }
 
+int main() {
+    pthread_t t1, t2;
 
-
-
-#include <unistd.h>
-#include <stdio.h>
-#include <math.h>
-#include <stdlib.h>
-#include <sys/wait.h>
-
-int main(int argc, char *argv[]) {
-    char *who;
-    int status;
-
-    if(fork()) {
-        who = "parent";
-        printf("pi=%f\n", 4*atan(1));
-        wait(&status);
-        exit(0);
-    } else {
-        who = "child";
-        execlp("/usr/bin/date", "date", (char *)0);
+    // INITIALIZE: Prepare the mutex before creating threads
+    if (pthread_mutex_init(&lock, NULL) != 0) {
+        printf("Mutex initialization failed\n");
+        return 1;
     }
+
+    pthread_create(&t1, NULL, increment, NULL);
+    pthread_create(&t2, NULL, increment, NULL);
+
+    pthread_join(t1, NULL);
+    pthread_join(t2, NULL);
+
+    // DESTROY: Free resources used by the mutex
+    pthread_mutex_destroy(&lock);
+
+    printf("Final counter = %d\n", counter);
+    return 0;
 }
 
-
-
-#include <unistd.h>
 #include <stdio.h>
-#include <math.h>
-#include <stdlib.h>
-#include <sys/wait.h>
+#include <pthread.h>
+#include <semaphore.h>
+#include <unistd.h>
 
-int main(int argc, char *argv[]) {
-    char *who;
-    int status;
+#define BUFFER_SIZE 5
 
-    if(fork()) {
-        who = "parent";
-        printf("pi=%f\n", 4*atan(1));
-        wait(&status);
-        exit(0);
-    } else {
-        who = "child";
-        execlp("/bin/my-script", "my-script", "a", "b", (char *)0);
+int buffer[BUFFER_SIZE];
+int in = 0, out = 0;
+
+sem_t empty, full, mutex;
+
+void* producer(void* arg) {
+    int item = 1;
+    while (1) {
+        sem_wait(&empty); // Wait for an empty slot
+        sem_wait(&mutex); // Lock the buffer
+
+        buffer[in] = item;
+        printf("Producer produced %d at index %d\n", item, in);
+        in = (in + 1) % BUFFER_SIZE;
+        item++;
+
+        sem_post(&mutex); // Unlock the buffer
+        sem_post(&full);  // Signal that there is a new item
+
+        sleep(1);
     }
+    return NULL;
+}
+
+void* consumer(void* arg) {
+    while (1) {
+        sem_wait(&full);  // Wait for a full slot
+        sem_wait(&mutex); // Lock the buffer
+
+        int item = buffer[out];
+        printf("Consumer consumed %d from index %d\n", item, out);
+        out = (out + 1) % BUFFER_SIZE;
+
+        sem_post(&mutex); // Unlock the buffer
+        sem_post(&empty); // Signal that there is a new empty slot
+
+        sleep(2);
+    }
+    return NULL;
+}
+
+int main() {
+    pthread_t prod, cons;
+
+    sem_init(&empty, 0, BUFFER_SIZE);
+    sem_init(&full, 0, 0);
+    sem_init(&mutex, 0, 1);
+
+    pthread_create(&prod, NULL, producer, NULL);
+    pthread_create(&cons, NULL, consumer, NULL);
+
+    pthread_join(prod, NULL);
+    pthread_join(cons, NULL);
+
+    sem_destroy(&empty);
+    sem_destroy(&full);
+    sem_destroy(&mutex);
+
+    return 0;
 }
