@@ -2,12 +2,14 @@
 #include <unistd.h>
 #include <pthread.h>
 
-int counter = 0; // ตัวแปรร่วม
+int counter = 0;
+pthread_mutex_t lock;  // TODO: ประกาศ mutex
 
 void* increment(void* arg) {
     for (int i = 0; i < 100000; i++) {
-        // ไม่มีการล็อก
+        // TODO: ลองใส่ pthread_mutex_lock ที่นี่
         counter++;
+        // TODO: แล้วตามด้วย pthread_mutex_unlock
     }
     return NULL;
 }
@@ -15,29 +17,37 @@ void* increment(void* arg) {
 int main() {
     pthread_t t1, t2;
 
+    // TODO: initialize mutex
+    // pthread_mutex_init( ... );
+
     pthread_create(&t1, NULL, increment, NULL);
     pthread_create(&t2, NULL, increment, NULL);
 
     pthread_join(t1, NULL);
     pthread_join(t2, NULL);
+
+    // TODO: destroy mutex
 
     printf("Final counter = %d\n", counter);
     return 0;
 }
 
-
 #include <stdio.h>
 #include <unistd.h>
 #include <pthread.h>
 
-int counter = 0; 
-pthread_mutex_t lock; // 1. Declare the mutex
+int counter = 0;
+pthread_mutex_t lock;  // TODO: ประกาศ mutex เรียบร้อยแล้ว
 
 void* increment(void* arg) {
     for (int i = 0; i < 100000; i++) {
-        pthread_mutex_lock(&lock);   // 3. Lock before accessing shared data
+        // TODO: ล็อก Mutex ก่อนเข้า Critical Section
+        pthread_mutex_lock(&lock);
+        
         counter++;
-        pthread_mutex_unlock(&lock); // 4. Unlock after accessing shared data
+        
+        // TODO: ปลดล็อก Mutex หลังทำงานเสร็จ
+        pthread_mutex_unlock(&lock);
     }
     return NULL;
 }
@@ -45,11 +55,8 @@ void* increment(void* arg) {
 int main() {
     pthread_t t1, t2;
 
-    // 2. Initialize the mutex
-    if (pthread_mutex_init(&lock, NULL) != 0) {
-        printf("Mutex init failed\n");
-        return 1;
-    }
+    // TODO: initialize mutex
+    pthread_mutex_init(&lock, NULL);
 
     pthread_create(&t1, NULL, increment, NULL);
     pthread_create(&t2, NULL, increment, NULL);
@@ -57,7 +64,7 @@ int main() {
     pthread_join(t1, NULL);
     pthread_join(t2, NULL);
 
-    // 5. Destroy the mutex when done
+    // TODO: destroy mutex เพื่อคืนทรัพยากร
     pthread_mutex_destroy(&lock);
 
     printf("Final counter = %d\n", counter);
@@ -69,29 +76,27 @@ int main() {
 #include <pthread.h>
 
 int counter = 0;
-pthread_mutex_t lock;  // DECLARED: The mutex object
+pthread_mutex_t lock;  // TODO: ประกาศ mutex เรียบร้อยแล้ว
 
 void* increment(void* arg) {
+    // ล็อก Mutex ก่อนเริ่ม Loop ครั้งเดียว
+    pthread_mutex_lock(&lock);
+    
     for (int i = 0; i < 100000; i++) {
-        // LOCK: Start of Critical Section
-        pthread_mutex_lock(&lock);
-        
-        counter++;
-        
-        // UNLOCK: End of Critical Section
-        pthread_mutex_unlock(&lock);
+        counter++; // ทำงานรวดเดียวจนจบ
     }
+    
+    // ปลดล็อกหลังจากทำ Loop เสร็จสิ้นทั้งหมด
+    pthread_mutex_unlock(&lock);
+    
     return NULL;
 }
 
 int main() {
     pthread_t t1, t2;
 
-    // INITIALIZE: Prepare the mutex before creating threads
-    if (pthread_mutex_init(&lock, NULL) != 0) {
-        printf("Mutex initialization failed\n");
-        return 1;
-    }
+    // TODO: initialize mutex
+    pthread_mutex_init(&lock, NULL);
 
     pthread_create(&t1, NULL, increment, NULL);
     pthread_create(&t2, NULL, increment, NULL);
@@ -99,77 +104,9 @@ int main() {
     pthread_join(t1, NULL);
     pthread_join(t2, NULL);
 
-    // DESTROY: Free resources used by the mutex
+    // TODO: destroy mutex เพื่อคืนทรัพยากร
     pthread_mutex_destroy(&lock);
 
     printf("Final counter = %d\n", counter);
-    return 0;
-}
-
-#include <stdio.h>
-#include <pthread.h>
-#include <semaphore.h>
-#include <unistd.h>
-
-#define BUFFER_SIZE 5
-
-int buffer[BUFFER_SIZE];
-int in = 0, out = 0;
-
-sem_t empty, full, mutex;
-
-void* producer(void* arg) {
-    int item = 1;
-    while (1) {
-        sem_wait(&empty); // Wait for an empty slot
-        sem_wait(&mutex); // Lock the buffer
-
-        buffer[in] = item;
-        printf("Producer produced %d at index %d\n", item, in);
-        in = (in + 1) % BUFFER_SIZE;
-        item++;
-
-        sem_post(&mutex); // Unlock the buffer
-        sem_post(&full);  // Signal that there is a new item
-
-        sleep(1);
-    }
-    return NULL;
-}
-
-void* consumer(void* arg) {
-    while (1) {
-        sem_wait(&full);  // Wait for a full slot
-        sem_wait(&mutex); // Lock the buffer
-
-        int item = buffer[out];
-        printf("Consumer consumed %d from index %d\n", item, out);
-        out = (out + 1) % BUFFER_SIZE;
-
-        sem_post(&mutex); // Unlock the buffer
-        sem_post(&empty); // Signal that there is a new empty slot
-
-        sleep(2);
-    }
-    return NULL;
-}
-
-int main() {
-    pthread_t prod, cons;
-
-    sem_init(&empty, 0, BUFFER_SIZE);
-    sem_init(&full, 0, 0);
-    sem_init(&mutex, 0, 1);
-
-    pthread_create(&prod, NULL, producer, NULL);
-    pthread_create(&cons, NULL, consumer, NULL);
-
-    pthread_join(prod, NULL);
-    pthread_join(cons, NULL);
-
-    sem_destroy(&empty);
-    sem_destroy(&full);
-    sem_destroy(&mutex);
-
     return 0;
 }
