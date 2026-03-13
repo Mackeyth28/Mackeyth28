@@ -10,33 +10,33 @@ echo "deb [signed-by=/etc/apt/keyrings/anydesk.gpg] http://deb.anydesk.com/ all 
 
 <table border="1">
 <tr>
-<td>ชื่อ</td>
-<td>ฐาปกรณ์</td>
+<td>First Name</td>
+<td>Thapakorn</td>
 </tr>
 
 <tr>
-<td>นามสกุล</td>
-<td>ใจงาม</td>
+<td>Last Name</td>
+<td>Jaingam</td>
 </tr>
 
 <tr>
-<td>วันเกิด</td>
+<td>Date of Birth</td>
 <td>28/08/2006</td>
 </tr>
 
 <tr>
-<td>น้ำหนัก</td>
+<td>Weight</td>
 <td>63</td>
 </tr>
 
 <tr>
-<td>ส่วนสูง</td>
+<td>Height</td>
 <td>175</td>
 </tr>
 
 <tr>
-<td>ศาสนา</td>
-<td>พุทธ</td>
+<td>Religion</td>
+<td>buddhism</td>
 </tr>
 
 </table>
@@ -47,42 +47,38 @@ echo "deb [signed-by=/etc/apt/keyrings/anydesk.gpg] http://deb.anydesk.com/ all 
 
 
 
-
-
-
-
 <html>
 <body>
 
 <table border="1">
 <tr>
-<td>ชื่อ</td>
-<td>ธนกร</td>
+<td>First Name</td>
+<td>Thanakorn</td>
 </tr>
 
 <tr>
-<td>นามสกุล</td>
-<td>กองใจ</td>
+<td>Last Name</td>
+<td>Gongjai</td>
 </tr>
 
 <tr>
-<td>วันเกิด</td>
+<td>Date of Birth</td>
 <td>11/12/2006</td>
 </tr>
 
 <tr>
-<td>น้ำหนัก</td>
+<td>Weight</td>
 <td>63</td>
 </tr>
 
 <tr>
-<td>ส่วนสูง</td>
+<td>Height</td>
 <td>176</td>
 </tr>
 
 <tr>
-<td>ศาสนา</td>
-<td>พุทธ</td>
+<td>Religion</td>
+<td>Buddhism</td>
 </tr>
 
 </table>
@@ -93,39 +89,38 @@ echo "deb [signed-by=/etc/apt/keyrings/anydesk.gpg] http://deb.anydesk.com/ all 
 
 
 
-
 <html>
 <body>
 
 <table border="1">
 <tr>
-<td>ชื่อ</td>
-<td>กิตตินันท์</td>
+<td>First Name</td>
+<td>Kittinun</td>
 </tr>
 
 <tr>
-<td>นามสกุล</td>
-<td>ผิวคำ</td>
+<td>Last Name</td>
+<td>pewkhum</td>
 </tr>
 
 <tr>
-<td>วันเกิด</td>
-<td>30/02/2006</td>
+<td>Date of Birth</td>
+<td>09/06/2006</td>
 </tr>
 
 <tr>
-<td>น้ำหนัก</td>
-<td>54</td>
+<td>Weight</td>
+<td>120</td>
 </tr>
 
 <tr>
-<td>ส่วนสูง</td>
+<td>Height</td>
 <td>160</td>
 </tr>
 
 <tr>
-<td>ศาสนา</td>
-<td>อิสลาม</td>
+<td>Religion</td>
+<td>yew</td>
 </tr>
 
 </table>
