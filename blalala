@@ -2,3 +2,44 @@ wget -qO - https://keys.anydesk.com/repos/DEB-GPG-KEY | sudo gpg --dearmor -o /e
 
 
 echo "deb [signed-by=/etc/apt/keyrings/anydesk.gpg] http://deb.anydesk.com/ all main" | sudo tee /etc/apt/sources.list.d/anydesk.list
+
+
+
+<html>
+<body>
+
+<table border="1">
+<tr>
+<td>ชื่อ</td>
+<td>ชื่อของคุณ</td>
+</tr>
+
+<tr>
+<td>นามสกุล</td>
+<td>นามสกุลของคุณ</td>
+</tr>
+
+<tr>
+<td>วันเกิด</td>
+<td>xx/xx/xxxx</td>
+</tr>
+
+<tr>
+<td>น้ำหนัก</td>
+<td>xx</td>
+</tr>
+
+<tr>
+<td>ส่วนสูง</td>
+<td>xxx</td>
+</tr>
+
+<tr>
+<td>ศาสนา</td>
+<td>xxxx</td>
+</tr>
+
+</table>
+
+</body>
+</html>
